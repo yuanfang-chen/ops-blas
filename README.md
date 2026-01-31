@@ -18,7 +18,8 @@ ops-blas
 ├── example        //算子调用示例代码，包含可直接运行的Demo
 ├── include        //存放公共头文件
 ├── scripts        //脚本文件存放目录
-├── src            //主体源代码目录
+├── blaslt           //blaslt主体源代码目录
+├── blas            //blas主体源代码目录
 │   ├── utils      //公共函数
 │   ├── dot        //向量点积算子实现
 │   ├── gemv       //一般矩阵向量乘法算子实现
