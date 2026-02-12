@@ -1,0 +1,7 @@
+if(BUILD_TEST)
+    if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/${TEST_NAME})
+        add_subdirectory(${TEST_NAME})
+    else()
+        message(FATAL_ERROR "TEST directory not found: ${TEST_NAME}")
+    endif()
+endif()

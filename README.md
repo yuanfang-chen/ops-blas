@@ -67,8 +67,7 @@ source ${HOME}/Ascend/ascend-toolkit/set_env.sh
     编译加速库，设置加速库环境变量：
     ```sh
     cd ops-blas
-    bash scripts/build.sh
-    source output/ops-blas/set_env.sh
+    bash build.sh --op=scopy --run # --op=<算子名> --run可选参数，执行测试样例
     ```
     
 ### 调用示例说明
