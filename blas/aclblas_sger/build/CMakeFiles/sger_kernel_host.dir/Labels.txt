@@ -1,0 +1,13 @@
+# Target labels
+ sger_kernel_host
+# Source files and their labels
+/mnt/model/ccq/diffusers/aclblas_sger/build/CMakeFiles/sger_kernel_host
+/mnt/model/ccq/diffusers/aclblas_sger/build/CMakeFiles/sger_kernel_host.rule
+/mnt/model/ccq/diffusers/aclblas_sger/build/CMakeFiles/sger_kernel_host-complete.rule
+/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_host-prefix/src/sger_kernel_host-stamp/sger_kernel_host-build.rule
+/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_host-prefix/src/sger_kernel_host-stamp/sger_kernel_host-configure.rule
+/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_host-prefix/src/sger_kernel_host-stamp/sger_kernel_host-download.rule
+/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_host-prefix/src/sger_kernel_host-stamp/sger_kernel_host-install.rule
+/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_host-prefix/src/sger_kernel_host-stamp/sger_kernel_host-mkdir.rule
+/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_host-prefix/src/sger_kernel_host-stamp/sger_kernel_host-patch.rule
+/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_host-prefix/src/sger_kernel_host-stamp/sger_kernel_host-update.rule

@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/CMakeFiles/sger_kernel_precompile"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/CMakeFiles/sger_kernel_precompile.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/CMakeFiles/sger_kernel_precompile-complete.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_precompile-prefix/src/sger_kernel_precompile-stamp/sger_kernel_precompile-build.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_precompile-prefix/src/sger_kernel_precompile-stamp/sger_kernel_precompile-configure.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_precompile-prefix/src/sger_kernel_precompile-stamp/sger_kernel_precompile-download.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_precompile-prefix/src/sger_kernel_precompile-stamp/sger_kernel_precompile-install.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_precompile-prefix/src/sger_kernel_precompile-stamp/sger_kernel_precompile-mkdir.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_precompile-prefix/src/sger_kernel_precompile-stamp/sger_kernel_precompile-patch.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_precompile-prefix/src/sger_kernel_precompile-stamp/sger_kernel_precompile-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"sger_kernel_precompile"
+		],
+		"name" : "sger_kernel_precompile"
+	}
+}

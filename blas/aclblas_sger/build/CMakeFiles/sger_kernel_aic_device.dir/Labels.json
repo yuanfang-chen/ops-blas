@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/CMakeFiles/sger_kernel_aic_device"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/CMakeFiles/sger_kernel_aic_device.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/CMakeFiles/sger_kernel_aic_device-complete.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_aic_device-prefix/src/sger_kernel_aic_device-stamp/sger_kernel_aic_device-build.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_aic_device-prefix/src/sger_kernel_aic_device-stamp/sger_kernel_aic_device-configure.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_aic_device-prefix/src/sger_kernel_aic_device-stamp/sger_kernel_aic_device-download.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_aic_device-prefix/src/sger_kernel_aic_device-stamp/sger_kernel_aic_device-install.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_aic_device-prefix/src/sger_kernel_aic_device-stamp/sger_kernel_aic_device-mkdir.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_aic_device-prefix/src/sger_kernel_aic_device-stamp/sger_kernel_aic_device-patch.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_aic_device-prefix/src/sger_kernel_aic_device-stamp/sger_kernel_aic_device-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"sger_kernel_aic_device"
+		],
+		"name" : "sger_kernel_aic_device"
+	}
+}

@@ -1,0 +1,43 @@
+{
+	"sources" : 
+	[
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/CMakeFiles/sger_kernel_host"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/CMakeFiles/sger_kernel_host.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/CMakeFiles/sger_kernel_host-complete.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_host-prefix/src/sger_kernel_host-stamp/sger_kernel_host-build.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_host-prefix/src/sger_kernel_host-stamp/sger_kernel_host-configure.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_host-prefix/src/sger_kernel_host-stamp/sger_kernel_host-download.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_host-prefix/src/sger_kernel_host-stamp/sger_kernel_host-install.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_host-prefix/src/sger_kernel_host-stamp/sger_kernel_host-mkdir.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_host-prefix/src/sger_kernel_host-stamp/sger_kernel_host-patch.rule"
+		},
+		{
+			"file" : "/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_host-prefix/src/sger_kernel_host-stamp/sger_kernel_host-update.rule"
+		}
+	],
+	"target" : 
+	{
+		"labels" : 
+		[
+			"sger_kernel_host"
+		],
+		"name" : "sger_kernel_host"
+	}
+}

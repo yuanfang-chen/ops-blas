@@ -1,0 +1,13 @@
+# Target labels
+ sger_kernel_aiv_device
+# Source files and their labels
+/mnt/model/ccq/diffusers/aclblas_sger/build/CMakeFiles/sger_kernel_aiv_device
+/mnt/model/ccq/diffusers/aclblas_sger/build/CMakeFiles/sger_kernel_aiv_device.rule
+/mnt/model/ccq/diffusers/aclblas_sger/build/CMakeFiles/sger_kernel_aiv_device-complete.rule
+/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_aiv_device-prefix/src/sger_kernel_aiv_device-stamp/sger_kernel_aiv_device-build.rule
+/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_aiv_device-prefix/src/sger_kernel_aiv_device-stamp/sger_kernel_aiv_device-configure.rule
+/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_aiv_device-prefix/src/sger_kernel_aiv_device-stamp/sger_kernel_aiv_device-download.rule
+/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_aiv_device-prefix/src/sger_kernel_aiv_device-stamp/sger_kernel_aiv_device-install.rule
+/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_aiv_device-prefix/src/sger_kernel_aiv_device-stamp/sger_kernel_aiv_device-mkdir.rule
+/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_aiv_device-prefix/src/sger_kernel_aiv_device-stamp/sger_kernel_aiv_device-patch.rule
+/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_aiv_device-prefix/src/sger_kernel_aiv_device-stamp/sger_kernel_aiv_device-update.rule

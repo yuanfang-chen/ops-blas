@@ -1,0 +1,2 @@
+/usr/bin/ar qc libsger_kernel_interface.a CMakeFiles/sger_kernel_interface.dir/sger_kernel_stub.cpp.o
+/usr/bin/ranlib libsger_kernel_interface.a
