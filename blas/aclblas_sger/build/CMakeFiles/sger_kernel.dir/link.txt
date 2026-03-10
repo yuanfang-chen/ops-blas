@@ -1,2 +1,0 @@
-/usr/bin/ar qc lib/libsger_kernel.a CMakeFiles/sger_kernel_host_stub_obj.dir/auto_gen/sger_kernel/host_stub.cpp.o ascendc_runtime.cpp.o aicpu_rt.cpp.o ascendc_elf_tool.c.o
-/usr/bin/ranlib lib/libsger_kernel.a

@@ -1,7 +1,0 @@
-/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_host-prefix/src/sger_kernel_host-build/CMakeFiles/host_bisheng_obj.dir
-/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_host-prefix/src/sger_kernel_host-build/CMakeFiles/edit_cache.dir
-/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_host-prefix/src/sger_kernel_host-build/CMakeFiles/rebuild_cache.dir
-/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_host-prefix/src/sger_kernel_host-build/CMakeFiles/list_install_components.dir
-/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_host-prefix/src/sger_kernel_host-build/CMakeFiles/install.dir
-/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_host-prefix/src/sger_kernel_host-build/CMakeFiles/install/local.dir
-/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_host-prefix/src/sger_kernel_host-build/CMakeFiles/install/strip.dir

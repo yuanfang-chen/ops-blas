@@ -1,4 +1,0 @@
-/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_precompile-prefix/src/sger_kernel_precompile-build/CMakeFiles/precompile_obj.dir
-/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_precompile-prefix/src/sger_kernel_precompile-build/CMakeFiles/check_src_template.dir
-/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_precompile-prefix/src/sger_kernel_precompile-build/CMakeFiles/edit_cache.dir
-/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_precompile-prefix/src/sger_kernel_precompile-build/CMakeFiles/rebuild_cache.dir

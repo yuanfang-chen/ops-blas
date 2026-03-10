@@ -1,2 +1,0 @@
-/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_aic_device-prefix/src/sger_kernel_aic_device-build/CMakeFiles/edit_cache.dir
-/mnt/model/ccq/diffusers/aclblas_sger/build/sger_kernel_aic_device-prefix/src/sger_kernel_aic_device-build/CMakeFiles/rebuild_cache.dir
