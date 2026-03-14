@@ -28,7 +28,7 @@
 
 ## 算子描述
 
-- 算子功能：  
+- 算子功能：
   `blasLtMatmul` 用于完成矩阵乘法，并可通过 epilogue 融合后处理（如 bias、ReLU 等）。其基础数学表达式为：
 
 ```
@@ -80,7 +80,7 @@ D = alpha * op(A) * op(B) + beta * C
 
 在本样例根目录下执行如下步骤，编译并执行算子。
 
-- 配置环境变量  
+- 配置环境变量
   请根据当前环境上 CANN 开发套件包的安装方式，选择对应配置环境变量的命令。
 
   - 默认路径，root 用户安装 CANN 软件包
@@ -104,7 +104,7 @@ source ${install_path}/cann/set_env.sh
 - 样例执行
 
 ```bash
-bash build.sh --op=blasLtMatmul --run # --op=<算子名> --run 可选参数，执行测试样例
+bash build.sh --op=blasLtMatmul --soc=ascend950 --run
 ```
 
 执行结果如下，说明精度对比成功。

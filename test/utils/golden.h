@@ -1,16 +1,14 @@
-#ifndef OPS_BLAS_TEST_COMMON_UTIL_H
-#define OPS_BLAS_TEST_COMMON_UTIL_H
+#ifndef OPS_BLAS_TEST_UTILS_GOLDEN_H
+#define OPS_BLAS_TEST_UTILS_GOLDEN_H
 
 #include <algorithm>
 #include <cmath>
 #include <cstdint>
-#include <iostream>
 #include <random>
 #include <stdexcept>
 #include <string>
 #include <type_traits>
 #include <vector>
-#include "acl/acl.h"
 
 template <typename T>
 void FillRandomData(std::vector<T>& data, T min, T max)
@@ -94,34 +92,4 @@ inline void parseArguments(int argc, char* argv[], int& m, int& k, int& n)
   }
 }
 
-#define CHECK_RET(cond, return_expr) \
-  do {                               \
-    if (!(cond)) {                   \
-      return_expr;                   \
-    }                                \
-  } while (0)
-
-#define LOG_PRINT(message, ...)     \
-  do {                              \
-    printf(message, ##__VA_ARGS__); \
-  } while (0)
-
-#define CHECK_ACLRT(func)                                                               \
-  {                                                                                     \
-    aclError status = (func);                                                           \
-    if (status != ACL_SUCCESS) {                                                        \
-      std::cerr << "ACL Runtime Error at " << __FILE__ << ":" << __LINE__ << " (error code: " << status << ")" << std::endl; \
-      exit(EXIT_FAILURE);                                                               \
-    }                                                                                   \
-  }
-
-#define CHECK_ACLBLASLT(func)                                                      \
-  {                                                                                \
-    aclblasStatus_t status = (func);                                               \
-    if (status != ACLBLAS_STATUS_SUCCESS) {                                        \
-      std::cerr << "BLASLT Error at " << __FILE__ << ":" << __LINE__ << " (error code: " << status << ")" << std::endl; \
-      exit(EXIT_FAILURE);                                                          \
-    }                                                                              \
-  }
-
-#endif // OPS_BLAS_TEST_COMMON_UTIL_H
+#endif // OPS_BLAS_TEST_UTILS_GOLDEN_H

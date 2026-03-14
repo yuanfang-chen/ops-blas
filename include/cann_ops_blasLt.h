@@ -26,26 +26,24 @@ extern "C" {
 #endif
 
 /*! \ingroup types_module
- *  \brief Descriptor of the matrix layout.
- */
-typedef struct
-{
-  uint64_t data[4];
-} aclblasLtMatrixLayoutOpaque_t;
-
-typedef aclblasLtMatrixLayoutOpaque_t* aclblasLtMatrixLayout_t;
-
-/*! \ingroup types_module
  *  \brief Descriptor of the library context.
  */
 typedef void* aclblasLtHandle_t;
 
 /*! \ingroup types_module
+ *  \brief Descriptor of the matrix layout.
+ */
+typedef struct {
+  uint64_t data[8];
+} aclblasLtMatrixLayoutOpaque_t;
+
+typedef aclblasLtMatrixLayoutOpaque_t* aclblasLtMatrixLayout_t;
+
+/*! \ingroup types_module
  *  \brief Descriptor of the matmul operation.
  */
-typedef struct
-{
-  uint64_t data[4];
+typedef struct {
+  uint64_t data[24];
 } aclblasLtMatmulDescOpaque_t;
 
 typedef aclblasLtMatmulDescOpaque_t* aclblasLtMatmulDesc_t;
@@ -53,9 +51,8 @@ typedef aclblasLtMatmulDescOpaque_t* aclblasLtMatmulDesc_t;
 /*! \ingroup types_module
  *  \brief Descriptor of the matmul preference.
  */
-typedef struct
-{
-  uint64_t data[5];
+typedef struct {
+  uint64_t data[8];
 } aclblasLtMatmulPreferenceOpaque_t;
 
 typedef aclblasLtMatmulPreferenceOpaque_t* aclblasLtMatmulPreference_t;
@@ -79,9 +76,9 @@ typedef struct _aclblasLtMatmulAlgo_t {
  */
 typedef struct _aclblasLtMatmulHeuristicResult_t {
   aclblasLtMatmulAlgo_t algo; /**< Algo struct */
-  size_t workspaceSize;       /**< Actual size of workspace memory required. */
-  aclblasStatus_t state;      /**< Result status. */
-  float wavesCount;           /**< Waves count is a device utilization metric. */
+  size_t workspaceSize = 0;       /**< Actual size of workspace memory required. */
+  aclblasStatus_t state = ACLBLAS_STATUS_SUCCESS;      /**< Result status. */
+  float wavesCount = 1.0;           /**< Waves count is a device utilization metric. */
   int reserved[4];            /**< Reserved. */
 } aclblasLtMatmulHeuristicResult_t;
 
@@ -135,47 +132,13 @@ typedef enum aclblasLtEpilogue {
  *  \brief Matrix layout attributes.
  */
 typedef enum aclblasLtMatrixLayoutAttribute {
-  ACLBLASLT_MATRIX_LAYOUT_BATCH_COUNT = 0,         /**<Number of batches of this matrix. Default value is 1. Data type: ``int32_t``. */
-  ACLBLASLT_MATRIX_LAYOUT_STRIDED_BATCH_OFFSET = 1, /**<Stride (in elements) to the next matrix for the strided batch operation. Default value is 0. Data type: ``int64_t``. */
-  /** Data type. See ``aclDataType``.
-   *
-   * ``uint32_t``
-   */
-  ACLBLASLT_MATRIX_LAYOUT_TYPE = 2,
-
-  /** Memory order of the data. See ``aclblasLtOrder_t``.
-   *
-   * ``int32_t``, default: ``ACLBLASLT_ORDER_COL``.
-   */
-  ACLBLASLT_MATRIX_LAYOUT_ORDER = 3,
-
-  /** Number of rows.
-   *
-   * Typically only values that can be expressed as ``int32_t`` are supported.
-   *
-   * ``uint64_t``
-   */
-  ACLBLASLT_MATRIX_LAYOUT_ROWS = 4,
-
-  /** Number of columns.
-   *
-   * Typically only values that can be expressed as ``int32_t`` are supported.
-   *
-   * ``uint64_t``
-   */
-  ACLBLASLT_MATRIX_LAYOUT_COLS = 5,
-
-  /** Matrix leading dimension.
-   *
-   * For ``ACLBLASLT_ORDER_COL``, this is the stride (in elements) of the matrix column. For more details and documentation for
-   * other memory orders, see the documentation for ``a c lblasLtOrder_t`` values.
-   *
-   * Currently only non-negative values are supported. The value must be large enough so that matrix memory locations are not
-   * overlapping (that is, greater or equal to ``ACLBLASLT_MATRIX_LAYOUT_ROWS`` in the case of ``ACLBLASLT_ORDER_COL``).
-   *
-   * ``int64_t``
-   */
-  ACLBLASLT_MATRIX_LAYOUT_LD = 6,
+  ACLBLASLT_MATRIX_LAYOUT_BATCH_COUNT = 0,          /**< Batch count. Default: 1. Type: ``int32_t``. */
+  ACLBLASLT_MATRIX_LAYOUT_STRIDED_BATCH_OFFSET = 1, /**< Strided-batch offset (elements). Default: 0. Type: ``int64_t``. */
+  ACLBLASLT_MATRIX_LAYOUT_TYPE = 2,                 /**< Matrix data type. See ``aclDataType``. Type: ``uint32_t``. */
+  ACLBLASLT_MATRIX_LAYOUT_ORDER = 3,                /**< Memory order. See ``aclblasLtOrder_t``. Default: ``ACLBLASLT_ORDER_COL``. Type: ``int32_t``. */
+  ACLBLASLT_MATRIX_LAYOUT_ROWS = 4,                 /**< Row count. Type: ``uint64_t``. */
+  ACLBLASLT_MATRIX_LAYOUT_COLS = 5,                 /**< Column count. Type: ``uint64_t``. */
+  ACLBLASLT_MATRIX_LAYOUT_LD = 6,                   /**< Leading dimension (elements). Type: ``int64_t``. */
 } aclblasLtMatrixLayoutAttribute_t;
 
 /*! \ingroup types_module
@@ -201,9 +164,9 @@ typedef enum aclblasLtMatmulDescAttribute {
   ACLBLASLT_MATMUL_DESC_A_SCALE_MODE = 31,                   /**<Scaling mode that defines how the matrix scaling factor for matrix A is interpreted. See ``aclblasLtMatmulMatrixScale_t``. */
   ACLBLASLT_MATMUL_DESC_B_SCALE_MODE = 32,                   /**<Scaling mode that defines how the matrix scaling factor for matrix B is interpreted. See ``aclblasLtMatmulMatrixScale_t``. */
   ACLBLASLT_MATMUL_DESC_COMPUTE_INPUT_TYPE_A_EXT = 100,     /**<Compute input A types. Defines the data type used for the input A of a matrix multiply. */
-  ACLBLASLT_MATMUL_DESC_COMPUTE_INPUT_TYPE_B_EXT,           /**<Compute input B types. Defines the data type used for the input B of a matrix multiply. */
-  ACLBLASLT_MATMUL_DESC_EPILOGUE_ACT_ARG0_EXT,              /**<First extra argument for the activation function. Data type: ``float``. */
-  ACLBLASLT_MATMUL_DESC_EPILOGUE_ACT_ARG1_EXT,              /**<Second extra argument for the activation function. Data type: ``float``. */
+  ACLBLASLT_MATMUL_DESC_COMPUTE_INPUT_TYPE_B_EXT = 101,           /**<Compute input B types. Defines the data type used for the input B of a matrix multiply. */
+  ACLBLASLT_MATMUL_DESC_EPILOGUE_ACT_ARG0_EXT = 102,              /**<First extra argument for the activation function. Data type: ``float``. */
+  ACLBLASLT_MATMUL_DESC_EPILOGUE_ACT_ARG1_EXT = 103,              /**<Second extra argument for the activation function. Data type: ``float``. */
   ACLBLASLT_MATMUL_DESC_MAX,
 } aclblasLtMatmulDescAttribute_t;
 
@@ -239,13 +202,13 @@ typedef enum aclblasLtMatmulPreferenceAttribute {
  *  aclBLASLt handle should be created for each device.
  *
  *  @param[out]
- *  handle Pointer to the allocated aclBLASLt handle for the created aclBLASLt
+ *  lightHandle Pointer to the allocated aclBLASLt handle for the created aclBLASLt
  *  context.
  *
  *  \retval ACLBLAS_STATUS_SUCCESS The allocation completed successfully.
- *  \retval ACLBLAS_STATUS_INVALID_VALUE \p handle == NULL.
+ *  \retval ACLBLAS_STATUS_INVALID_VALUE \p lightHandle == NULL.
  */
-aclblasStatus_t aclblasLtCreate(aclblasLtHandle_t* handle);
+aclblasStatus_t aclblasLtCreate(aclblasLtHandle_t* lightHandle);
 
 /*! \ingroup library_module
  *  \brief Destroy a aclBLASLt handle.
@@ -259,13 +222,15 @@ aclblasStatus_t aclblasLtCreate(aclblasLtHandle_t* handle);
  *  the number of aclblasLtCreate() / aclblasLtDestroy() occurrences.
  *
  *  @param[in]
- *  handle Pointer to the aclBLASLt handle to be destroyed.
+ *  lightHandle Pointer to the aclBLASLt handle to be destroyed.
  *
  *  \retval ACLBLAS_STATUS_SUCCESS The aclBLASLt context was successfully
- *  destroyed. \retval ACLBLAS_STATUS_NOT_INITIALIZED The aclBLASLt library was
- *  not initialized. \retval ACLBLAS_STATUS_INVALID_VALUE \p handle == NULL.
+ *  destroyed.
+ *  \retval ACLBLAS_STATUS_NOT_INITIALIZED The aclBLASLt library was
+ *  not initialized.
+ *  \retval ACLBLAS_STATUS_INVALID_VALUE \p lightHandle == NULL.
  */
-aclblasStatus_t aclblasLtDestroy(const aclblasLtHandle_t handle);
+aclblasStatus_t aclblasLtDestroy(const aclblasLtHandle_t lightHandle);
 
 // Matrix layout descriptor
 /*! \ingroup library_module
@@ -294,10 +259,10 @@ aclblasStatus_t aclblasLtDestroy(const aclblasLtHandle_t handle);
  *  \retval ACLBLAS_STATUS_ALLOC_FAILED If the memory could not be allocated.
  */
 aclblasStatus_t aclblasLtMatrixLayoutCreate(aclblasLtMatrixLayout_t* matLayout,
-                                           aclDataType type,
-                                           uint64_t rows,
-                                           uint64_t cols,
-                                           int64_t ld);
+                                            aclDataType type,
+                                            uint64_t rows,
+                                            uint64_t cols,
+                                            int64_t ld);
 
 /*! \ingroup library_module
  *  \brief Destroy a matrix layout descriptor.
@@ -336,18 +301,18 @@ aclblasStatus_t aclblasLtMatrixLayoutDestroy(const aclblasLtMatrixLayout_t matLa
  *  doesn't match the size of the internal storage for the selected attribute.
  */
 aclblasStatus_t aclblasLtMatrixLayoutSetAttribute(aclblasLtMatrixLayout_t matLayout,
-                                                 aclblasLtMatrixLayoutAttribute_t attr,
-                                                 const void* buf,
-                                                 size_t sizeInBytes);
+                                                  aclblasLtMatrixLayoutAttribute_t attr,
+                                                  const void* buf,
+                                                  size_t sizeInBytes);
 
 /*! \ingroup library_module
  *  \brief Get an attribute for a matrix descriptor.
  */
 aclblasStatus_t aclblasLtMatrixLayoutGetAttribute(const aclblasLtMatrixLayout_t matLayout,
-    aclblasLtMatrixLayoutAttribute_t attr,
-    void* buf,
-    size_t sizeInBytes,
-    size_t* sizeWritten);
+                                                  aclblasLtMatrixLayoutAttribute_t attr,
+                                                  void* buf,
+                                                  size_t sizeInBytes,
+                                                  size_t* sizeWritten);
 
 // Matmul operation descriptor
 /*! \ingroup library_module
@@ -371,8 +336,8 @@ aclblasStatus_t aclblasLtMatrixLayoutGetAttribute(const aclblasLtMatrixLayout_t 
  *  \retval ACLBLAS_STATUS_ALLOC_FAILED If the memory could not be allocated.
  */
 aclblasStatus_t aclblasLtMatmulDescCreate(aclblasLtMatmulDesc_t* matmulDesc,
-                                         aclblasComputeType_t computeType,
-                                         aclDataType scaleType);
+                                          aclblasComputeType_t computeType,
+                                          aclDataType scaleType);
 
 /*! \ingroup library_module
  *  \brief Destroy a matrix multiply descriptor.
@@ -412,9 +377,39 @@ aclblasStatus_t aclblasLtMatmulDescDestroy(const aclblasLtMatmulDesc_t matmulDes
  *  doesn't match the size of the internal storage for the selected attribute.
  */
 aclblasStatus_t aclblasLtMatmulDescSetAttribute(aclblasLtMatmulDesc_t matmulDesc,
-                                               aclblasLtMatmulDescAttribute_t attr,
-                                               const void* buf,
-                                               size_t sizeInBytes);
+                                                aclblasLtMatmulDescAttribute_t attr,
+                                                const void* buf,
+                                                size_t sizeInBytes);
+
+/*! \ingroup library_module
+ *  \brief Get an attribute from a matrix multiply descriptor.
+ *
+ *  \details
+ *  This function retrieves the value of the specified attribute from a
+ *  previously created matrix multiply descriptor.
+ *
+ *  @param[in]
+ *  desc Pointer to the previously created matrix multiply descriptor. See
+ *  \ref aclblasLtMatmulDesc_t.
+ *  @param[in]
+ *  attr The attribute to query. See \ref aclblasLtMatmulDescAttribute_t.
+ *  @param[out]
+ *  buf Output buffer used to store the queried attribute value.
+ *  @param[in]
+ *  sizeInBytes Size of \p buf in bytes.
+ *  @param[out]
+ *  sizeWritten Number of bytes actually written to \p buf. Can be NULL.
+ *
+ *  \retval ACLBLAS_STATUS_SUCCESS If the attribute was retrieved successfully.
+ *  \retval ACLBLAS_STATUS_INVALID_VALUE If \p desc or \p buf is NULL, or
+ *  \p sizeInBytes is smaller than the required size for the selected
+ *  attribute.
+ */
+aclblasStatus_t aclblasLtMatmulDescGetAttribute(aclblasLtMatmulDesc_t desc,
+                                                aclblasLtMatmulDescAttribute_t attr,
+                                                void* buf,
+                                                size_t sizeInBytes,
+                                                size_t* sizeWritten);
 
 // Preference
 /*! \ingroup library_module
@@ -429,7 +424,8 @@ aclblasStatus_t aclblasLtMatmulDescSetAttribute(aclblasLtMatmulDesc_t matmulDesc
  *  descriptor created by this function. see \ref aclblasLtMatmulPreference_t.
  *
  *  \retval ACLBLAS_STATUS_SUCCESS If the descriptor was created
- *  successfully. \retval ACLBLAS_STATUS_ALLOC_FAILED If memory could not be
+ *  successfully.
+ *  \retval ACLBLAS_STATUS_ALLOC_FAILED If memory could not be
  *  allocated.
  */
 aclblasStatus_t aclblasLtMatmulPreferenceCreate(aclblasLtMatmulPreference_t* pref);
@@ -474,11 +470,43 @@ aclblasStatus_t aclblasLtMatmulPreferenceDestroy(const aclblasLtMatmulPreference
  *  doesn't match the size of the internal storage for the selected attribute.
  */
 aclblasStatus_t aclblasLtMatmulPreferenceSetAttribute(aclblasLtMatmulPreference_t pref,
-                                                     aclblasLtMatmulPreferenceAttribute_t attr,
-                                                     const void* buf,
-                                                     size_t sizeInBytes);
+                                                      aclblasLtMatmulPreferenceAttribute_t attr,
+                                                      const void* buf,
+                                                      size_t sizeInBytes);
 
-// Heuristic + matmul
+
+/*! \ingroup library_module
+ *  \brief Get an attribute from a preference descriptor.
+ *
+ *  \details
+ *  This function retrieves the value of the specified attribute from a
+ *  previously created matrix multiply preference descriptor.
+ *
+ *  @param[in]
+ *  pref Pointer to the previously created preference descriptor. See
+ *  \ref aclblasLtMatmulPreference_t.
+ *  @param[in]
+ *  attr The attribute to query. See
+ *  \ref aclblasLtMatmulPreferenceAttribute_t.
+ *  @param[out]
+ *  buf Output buffer used to store the queried attribute value.
+ *  @param[in]
+ *  sizeInBytes Size of \p buf in bytes.
+ *  @param[out]
+ *  sizeWritten Number of bytes actually written to \p buf. Can be NULL.
+ *
+ *  \retval ACLBLAS_STATUS_SUCCESS If the attribute was retrieved successfully.
+ *  \retval ACLBLAS_STATUS_INVALID_VALUE If \p pref or \p buf is NULL, or
+ *  \p sizeInBytes is smaller than the required size for the selected
+ *  attribute.
+ */
+aclblasStatus_t aclblasLtMatmulPreferenceGetAttribute(aclblasLtMatmulPreference_t pref,
+                                                      aclblasLtMatmulPreferenceAttribute_t attr,
+                                                      void* buf,
+                                                      size_t sizeInBytes,
+                                                      size_t* sizeWritten);
+
+// Heuristic
 /*! \ingroup library_module
  *  \brief Retrieve the possible algorithms.
  *
@@ -489,7 +517,7 @@ aclblasStatus_t aclblasLtMatmulPreferenceSetAttribute(aclblasLtMatmulPreference_
  *  in order of increasing estimated compute time.
  *
  *  @param[in]
- *  handle Pointer to the allocated aclBLASLt handle for the
+ *  lightHandle Pointer to the allocated aclBLASLt handle for the
  *  aclBLASLt context. See \ref aclblasLtHandle_t.
  *  @param[in]
  *  matmulDesc Handle to a previously created matrix multiplication
@@ -513,21 +541,24 @@ aclblasStatus_t aclblasLtMatmulPreferenceSetAttribute(aclblasLtMatmulPreference_
  *
  *  \retval ACLBLAS_STATUS_SUCCESS If query was successful. Inspect
  *  ``heuristicResultsArray[0 to (returnAlgoCount -1)].state`` for the status of the
- *  results. \retval ACLBLAS_STATUS_NOT_SUPPORTED If no heuristic function is
- *  available for current configuration. \retval ACLBLAS_STATUS_INVALID_VALUE If
+ *  results.
+ *  \retval ACLBLAS_STATUS_NOT_SUPPORTED If no heuristic function is
+ *  available for current configuration.
+ *  \retval ACLBLAS_STATUS_INVALID_VALUE If
  *  \p requestedAlgoCount is less than or equal to zero.
  */
-aclblasStatus_t aclblasLtMatmulAlgoGetHeuristic(aclblasLtHandle_t handle,
-                                               aclblasLtMatmulDesc_t matmulDesc,
-                                               aclblasLtMatrixLayout_t Adesc,
-                                               aclblasLtMatrixLayout_t Bdesc,
-                                               aclblasLtMatrixLayout_t Cdesc,
-                                               aclblasLtMatrixLayout_t Ddesc,
-                                               aclblasLtMatmulPreference_t pref,
-                                               int requestedAlgoCount,
-                                               aclblasLtMatmulHeuristicResult_t heuristicResultsArray[],
-                                               int* returnAlgoCount);
+aclblasStatus_t aclblasLtMatmulAlgoGetHeuristic(aclblasLtHandle_t lightHandle,
+                                                aclblasLtMatmulDesc_t matmulDesc,
+                                                aclblasLtMatrixLayout_t Adesc,
+                                                aclblasLtMatrixLayout_t Bdesc,
+                                                aclblasLtMatrixLayout_t Cdesc,
+                                                aclblasLtMatrixLayout_t Ddesc,
+                                                aclblasLtMatmulPreference_t pref,
+                                                int requestedAlgoCount,
+                                                aclblasLtMatmulHeuristicResult_t heuristicResultsArray[],
+                                                int* returnAlgoCount);
 
+// Matmul
 /*! \ingroup library_module
  *  \brief Matrix-matrix multiplication.
  *
@@ -540,10 +571,10 @@ aclblasStatus_t aclblasLtMatmulAlgoGetHeuristic(aclblasLtHandle_t handle,
  *  out-of-place matrix multiplication (``C != D``).
  *
  *  @param[in]
- *  handle Pointer to the allocated aclBLASLt handle for the
+ *  lightHandle Pointer to the allocated aclBLASLt handle for the
  *  aclBLASLt context. See \ref aclblasLtHandle_t.
  *  @param[in]
- *  matmulDesc Handle to a previously created matrix multiplication
+ *  computeDesc Handle to a previously created matrix multiplication
  *  descriptor of type \ref aclblasLtMatmulDesc_t.
  *  @param[in]
  *  alpha,beta Pointers to the scalars used in the multiplication.
@@ -570,31 +601,33 @@ aclblasStatus_t aclblasLtMatmulAlgoGetHeuristic(aclblasLtHandle_t handle,
  *  stream The stream where all device work is submitted.
  *
  *  \retval ACLBLAS_STATUS_SUCCESS If the operation completed
- *  successfully. \retval ACLBLAS_STATUS_EXECUTION_FAILED If device reported an
- *  execution error. \retval ACLBLAS_STATUS_ARCH_MISMATCH If
- *  the configured operation cannot be run using the selected device. \retval
- *  ACLBLAS_STATUS_NOT_SUPPORTED If the current implementation on the
- *  selected device doesn't support the configured operation. \retval
- *  ACLBLAS_STATUS_INVALID_VALUE If the parameters are unexpectedly NULL, in
- *  conflict, or in an impossible configuration. \retval ACLBLAS_STATUS_NOT_INITIALIZED
- *  If the aclBLASLt handle has not been initialized.
+ *  successfully.
+ *  \retval ACLBLAS_STATUS_EXECUTION_FAILED If device reported an
+ *  execution error.
+ *  \retval ACLBLAS_STATUS_ARCH_MISMATCH If
+ *  the configured operation cannot be run using the selected device.
+ *  \retval ACLBLAS_STATUS_NOT_SUPPORTED If the current implementation on the
+ *  selected device doesn't support the configured operation.
+ *  \retval ACLBLAS_STATUS_INVALID_VALUE If the parameters are unexpectedly NULL, in
+ *  conflict, or in an impossible configuration.
+ *  \retval ACLBLAS_STATUS_NOT_INITIALIZED If the aclBLASLt handle has not been initialized.
  */
-aclblasStatus_t aclblasLtMatmul(aclblasLtHandle_t handle,
-                               aclblasLtMatmulDesc_t matmulDesc,
-                               const void* alpha,
-                               const void* A,
-                               aclblasLtMatrixLayout_t Adesc,
-                               const void* B,
-                               aclblasLtMatrixLayout_t Bdesc,
-                               const void* beta,
-                               const void* C,
-                               aclblasLtMatrixLayout_t Cdesc,
-                               void* D,
-                               aclblasLtMatrixLayout_t Ddesc,
-                               const aclblasLtMatmulAlgo_t* algo,
-                               void* workspace,
-                               size_t workspaceSizeInBytes,
-                               aclrtStream stream);
+aclblasStatus_t aclblasLtMatmul(aclblasLtHandle_t lightHandle,
+                                aclblasLtMatmulDesc_t computeDesc,
+                                const void* alpha,
+                                const void* A,
+                                aclblasLtMatrixLayout_t Adesc,
+                                const void* B,
+                                aclblasLtMatrixLayout_t Bdesc,
+                                const void* beta,
+                                const void* C,
+                                aclblasLtMatrixLayout_t Cdesc,
+                                void* D,
+                                aclblasLtMatrixLayout_t Ddesc,
+                                const aclblasLtMatmulAlgo_t* algo,
+                                void* workspace,
+                                size_t workspaceSizeInBytes,
+                                aclrtStream stream);
 
 #ifdef __cplusplus
 }

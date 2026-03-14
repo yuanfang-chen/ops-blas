@@ -17,19 +17,17 @@
 
 #include "acl/acl.h"
 #include "cann_ops_blasLt.h"
-#include "../common/util.h"
+#include "../utils/error_check.h"
+#include "../utils/golden.h"
 
 #define GM_ADDR uint8_t*
 
 int Init(int32_t deviceId, aclrtStream* stream)
 {
   // 固定写法，资源初始化
-  auto ret = aclInit(nullptr);
-  CHECK_RET(ret == ACL_SUCCESS, LOG_PRINT("aclInit failed. ERROR: %d\n", ret); return ret);
-  ret = aclrtSetDevice(deviceId);
-  CHECK_RET(ret == ACL_SUCCESS, LOG_PRINT("aclrtSetDevice failed. ERROR: %d\n", ret); return ret);
-  ret = aclrtCreateStream(stream);
-  CHECK_RET(ret == ACL_SUCCESS, LOG_PRINT("aclrtCreateStream failed. ERROR: %d\n", ret); return ret);
+  CHECK_ACLRT(aclInit(nullptr));
+  CHECK_ACLRT(aclrtSetDevice(deviceId));
+  CHECK_ACLRT(aclrtCreateStream(stream));
   return 0;
 }
 
@@ -50,7 +48,7 @@ aclError aclblasLtMatmulTest(int32_t deviceId, aclrtStream& stream)
 
   // 2. 创建 BLASLt 句柄
   aclblasLtHandle_t ltHandle;
-  CHECK_ACLBLASLT(aclblasLtCreate(&ltHandle));
+  CHECK_ACLBLAS(aclblasLtCreate(&ltHandle));
 
   // 3. 在Device上分配和初始化数据 (示例使用随机初始化)
   std::vector<float> hostInput(m * k, 0);
@@ -76,37 +74,37 @@ aclError aclblasLtMatmulTest(int32_t deviceId, aclrtStream& stream)
   aclblasLtMatrixLayout_t Adesc, Bdesc, Ddesc;
   aclblasLtOrder_t order = ACLBLASLT_ORDER_ROW;
   // 矩阵 A: FP32, 行主序, 维度 m x k
-  CHECK_ACLBLASLT(aclblasLtMatrixLayoutCreate(&Adesc, ACL_FLOAT, m, k, m));
-  CHECK_ACLBLASLT(aclblasLtMatrixLayoutSetAttribute(Adesc, ACLBLASLT_MATRIX_LAYOUT_ORDER, &order, sizeof(int)));
+  CHECK_ACLBLAS(aclblasLtMatrixLayoutCreate(&Adesc, ACL_FLOAT, m, k, m));
+  CHECK_ACLBLAS(aclblasLtMatrixLayoutSetAttribute(Adesc, ACLBLASLT_MATRIX_LAYOUT_ORDER, &order, sizeof(int)));
   // 矩阵 B: FP32, 行主序, 维度 k x n
-  CHECK_ACLBLASLT(aclblasLtMatrixLayoutCreate(&Bdesc, ACL_FLOAT, k, n, k));
-  CHECK_ACLBLASLT(aclblasLtMatrixLayoutSetAttribute(Bdesc, ACLBLASLT_MATRIX_LAYOUT_ORDER, &order, sizeof(int)));
+  CHECK_ACLBLAS(aclblasLtMatrixLayoutCreate(&Bdesc, ACL_FLOAT, k, n, k));
+  CHECK_ACLBLAS(aclblasLtMatrixLayoutSetAttribute(Bdesc, ACLBLASLT_MATRIX_LAYOUT_ORDER, &order, sizeof(int)));
   // 矩阵 D: FP32, 行主序, 维度 m x n
-  CHECK_ACLBLASLT(aclblasLtMatrixLayoutCreate(&Ddesc, ACL_FLOAT, m, n, m));
-  CHECK_ACLBLASLT(aclblasLtMatrixLayoutSetAttribute(Ddesc, ACLBLASLT_MATRIX_LAYOUT_ORDER, &order, sizeof(int)));
+  CHECK_ACLBLAS(aclblasLtMatrixLayoutCreate(&Ddesc, ACL_FLOAT, m, n, m));
+  CHECK_ACLBLAS(aclblasLtMatrixLayoutSetAttribute(Ddesc, ACLBLASLT_MATRIX_LAYOUT_ORDER, &order, sizeof(int)));
 
   // 5. 创建并设置计算描述符
   aclblasLtMatmulDesc_t operationDesc;
-  CHECK_ACLBLASLT(aclblasLtMatmulDescCreate(&operationDesc, ACLBLAS_COMPUTE_32F, ACL_FLOAT));
+  CHECK_ACLBLAS(aclblasLtMatmulDescCreate(&operationDesc, ACLBLAS_COMPUTE_32F, ACL_FLOAT));
   // 设置 epilogue
   aclblasLtEpilogue_t epilogue = ACLBLASLT_EPILOGUE_DEFAULT;
-  CHECK_ACLBLASLT(
+  CHECK_ACLBLAS(
       aclblasLtMatmulDescSetAttribute(operationDesc, ACLBLASLT_MATMUL_DESC_EPILOGUE, &epilogue, sizeof(epilogue)));
 
   // 6. 算法选择
   aclblasLtMatmulPreference_t preference;
-  CHECK_ACLBLASLT(aclblasLtMatmulPreferenceCreate(&preference));
+  CHECK_ACLBLAS(aclblasLtMatmulPreferenceCreate(&preference));
   // 为算法最多预留 12MB 的临时工作空间
   size_t max_workspaceSize = 12 * 1024 * 1024;
-  CHECK_ACLBLASLT(aclblasLtMatmulPreferenceSetAttribute(preference, ACLBLASLT_MATMUL_PREF_MAX_WORKSPACE_BYTES,
-                                                        &max_workspaceSize, sizeof(max_workspaceSize)));
+  CHECK_ACLBLAS(aclblasLtMatmulPreferenceSetAttribute(preference, ACLBLASLT_MATMUL_PREF_MAX_WORKSPACE_BYTES,
+                                                      &max_workspaceSize, sizeof(max_workspaceSize)));
 
   // 用于接收推荐算法
   int returnedAlgoCount = 0;
   const int request_solutions = 1;
   aclblasLtMatmulHeuristicResult_t heuristicResult[request_solutions];
-  CHECK_ACLBLASLT(aclblasLtMatmulAlgoGetHeuristic(ltHandle, operationDesc, Adesc, Bdesc, Ddesc, Ddesc, preference,
-                                                  request_solutions, heuristicResult, &returnedAlgoCount));
+  CHECK_ACLBLAS(aclblasLtMatmulAlgoGetHeuristic(ltHandle, operationDesc, Adesc, Bdesc, Ddesc, Ddesc, preference,
+                                                request_solutions, heuristicResult, &returnedAlgoCount));
 
   if (returnedAlgoCount == 0) {
     std::cerr << "No valid algorithm found for the given problem!" << std::endl;
@@ -122,32 +120,29 @@ aclError aclblasLtMatmulTest(int32_t deviceId, aclrtStream& stream)
   }
   void *d_workspace = nullptr;
   CHECK_ACLRT(aclrtMalloc(&d_workspace, workspace_size, ACL_MEM_MALLOC_HUGE_FIRST));
-  CHECK_ACLBLASLT(aclblasLtMatmul(ltHandle,
-                                  operationDesc,
-                                  &alpha,
-                                  d_A,
-                                  Adesc,
-                                  d_B,
-                                  Bdesc,
-                                  &beta,
-                                  d_D,
-                                  Ddesc,
-                                  d_D,
-                                  Ddesc,
-                                  &algo,
-                                  d_workspace,
-                                  workspace_size,
-                                  stream));
+  CHECK_ACLBLAS(aclblasLtMatmul(ltHandle,
+                                operationDesc,
+                                &alpha,
+                                d_A,
+                                Adesc,
+                                d_B,
+                                Bdesc,
+                                &beta,
+                                d_D,
+                                Ddesc,
+                                d_D,
+                                Ddesc,
+                                &algo,
+                                d_workspace,
+                                workspace_size,
+                                stream));
 
   // 8. 同步并检查错误
-  auto ret = aclInit(nullptr);
-  ret = aclrtSynchronizeStream(stream);
-  CHECK_RET(ret == ACL_SUCCESS, LOG_PRINT("aclrtSynchronizeStream failed. ERROR: %d\n", ret); return ret);
+  CHECK_ACLRT(aclrtSynchronizeStream(stream));
   std::cout << "aclblasLtMatmul executed successfully!" << std::endl;
   std::cout << "Heuristic returned " << returnedAlgoCount << " algorithm(s). Using the first one." << std::endl;
   // 输出数据Device To Host
-  ret = aclrtMemcpy(hostOutput.data(), sizeOutput, d_D, sizeOutput, ACL_MEMCPY_DEVICE_TO_HOST);
-  CHECK_RET(ret == ACL_SUCCESS, LOG_PRINT("aclrtMemcpy deviceOutput failed. ERROR: %d\n", ret); return ret);
+  CHECK_ACLRT(aclrtMemcpy(hostOutput.data(), sizeOutput, d_D, sizeOutput, ACL_MEMCPY_DEVICE_TO_HOST));
 
   // 9. 计算golden，对比精度
   ComputeGolden<float>(m, k, n, hostInput, hostWeight, goldenOutput);
@@ -169,12 +164,12 @@ aclError aclblasLtMatmulTest(int32_t deviceId, aclrtStream& stream)
   CHECK_ACLRT(aclrtFree(d_D));
   CHECK_ACLRT(aclrtFree(d_B));
   CHECK_ACLRT(aclrtFree(d_A));
-  CHECK_ACLBLASLT(aclblasLtMatmulPreferenceDestroy(preference));
-  CHECK_ACLBLASLT(aclblasLtMatmulDescDestroy(operationDesc));
-  CHECK_ACLBLASLT(aclblasLtMatrixLayoutDestroy(Ddesc));
-  CHECK_ACLBLASLT(aclblasLtMatrixLayoutDestroy(Bdesc));
-  CHECK_ACLBLASLT(aclblasLtMatrixLayoutDestroy(Adesc));
-  CHECK_ACLBLASLT(aclblasLtDestroy(ltHandle));
+  CHECK_ACLBLAS(aclblasLtMatmulPreferenceDestroy(preference));
+  CHECK_ACLBLAS(aclblasLtMatmulDescDestroy(operationDesc));
+  CHECK_ACLBLAS(aclblasLtMatrixLayoutDestroy(Ddesc));
+  CHECK_ACLBLAS(aclblasLtMatrixLayoutDestroy(Bdesc));
+  CHECK_ACLBLAS(aclblasLtMatrixLayoutDestroy(Adesc));
+  CHECK_ACLBLAS(aclblasLtDestroy(ltHandle));
 
   return ACL_SUCCESS;
 }
@@ -190,14 +185,13 @@ int main(int argc, char* argv[])
   //     printUsage(argv[0]);
   //     return 1;
   // }
+  
   // 固定写法，device/stream初始化，参考acl API手册
   // 根据自己的实际device填写deviceId
   int32_t deviceId = 0;
   aclrtStream stream;
-  auto ret = Init(deviceId, &stream);
-  CHECK_RET(ret == ACL_SUCCESS, LOG_PRINT("Init acl failed. ERROR: %d\n", ret); return ret);
-  ret = aclblasLtMatmulTest(deviceId, stream);
-  CHECK_RET(ret == ACL_SUCCESS, LOG_PRINT("aclblasLtMatmulTest failed. ERROR: %d\n", ret); return ret);
+  CHECK_ACLRT(Init(deviceId, &stream));
+  CHECK_ACLRT(aclblasLtMatmulTest(deviceId, stream));
   // 固定写法，释放资源
   Finalize(deviceId, stream);
   return 0;
