@@ -12,7 +12,7 @@
 set -e
 
 BUILD_DIR=build
-BUILD_OP=""
+BUILD_OPS=""
 RUN_TEST=OFF
 ENABLE_PACKAGE=FALSE
 
@@ -39,6 +39,17 @@ export GRAPH_LIBRARY_STUB_PATH="${ASCEND_HOME_PATH}/lib64/stub"
 export GRAPH_LIBRARY_PATH="${ASCEND_HOME_PATH}/lib64"
 CANN_3RD_LIB_PATH="${BUILD_PATH}/third_party"
 
+# 分隔线和错误打印函数（参考ops-nn/build.sh格式）
+dotted_line="----------------------------------------------------------------"
+print_error() {
+  echo
+  echo $dotted_line
+  local msg="$1"
+  echo -e "\033[31m[ERROR] ${msg}\033[0m"
+  echo $dotted_line
+  echo
+}
+
 # 支持的 SOC 版本
 # 按字符串长度从长到短排序，避免前缀匹配时出错
 SUPPORT_COMPUTE_UNIT_SHORT=("ascend910_93" "ascend910b" "ascend950" "ascend310p")
@@ -49,8 +60,8 @@ SUPPORT_COMPUTE_UNIT_SHORT=($(printf '%s\n' "${SUPPORT_COMPUTE_UNIT_SHORT[@]}" |
 # ==========================
 for arg in "$@"; do
     case $arg in
-        --op=*)
-            BUILD_OP="${arg#*=}"
+        --ops=*)
+            BUILD_OPS="${arg#*=}"
             ;;
         --run)
             RUN_TEST=ON
@@ -64,17 +75,45 @@ for arg in "$@"; do
         *)
             echo "Unknown option: $arg"
             echo "Usage:"
-            echo "  bash build.sh                      # 只编译库"
-            echo "  bash build.sh --op=scopy           # 编译指定算子"
-            echo "  bash build.sh --op=scopy --run     # 编译并运行算子"
-            echo "  bash build.sh --pkg                # 编译并打包run包"
-            echo "  bash build.sh --pkg --soc=ascend950 # 打包指定SOC的run包"
+            echo "  bash build.sh                                 # 只编译库"
+            echo "  bash build.sh --ops=scopy,blasLtMatmul        # 编译指定算子(多算子，逗号分隔)"
+            echo "  bash build.sh --run                           # 编译并运行所有算子测试"
+            echo "  bash build.sh --ops=scopy,blasLtMatmul --run  # 编译并运行多个算子"
+            echo "  bash build.sh --pkg                           # 编译并打包run包"
+            echo "  bash build.sh --pkg --soc=ascend950           # 打包指定SOC的run包"
             exit 1
             ;;
     esac
 done
 
-echo "BUILD_OP=${BUILD_OP}, RUN_TEST=${RUN_TEST}, ENABLE_PACKAGE=${ENABLE_PACKAGE}"
+# 校验 --run 和 --pkg 不能同时使用
+if [ "${RUN_TEST}" == "ON" ] && [ "${ENABLE_PACKAGE}" == "TRUE" ]; then
+  print_error "--run cannot be used with --pkg"
+  exit 1
+fi
+
+# 如果 --run 单独使用（没有指定算子），自动发现所有测试目录
+if [ "${RUN_TEST}" == "ON" ] && [ -z "${BUILD_OPS}" ]; then
+  # 从 test 目录下查找所有包含 CMakeLists.txt 的子目录
+  AUTO_DISCOVER_OPS=""
+  for dir in ${BASE_PATH}/test/*/; do
+    if [ -f "${dir}/CMakeLists.txt" ]; then
+      op_name=$(basename "${dir}")
+      # 排除 common 目录（非算子测试目录）
+      if [ "${op_name}" != "common" ]; then
+        if [ -z "${AUTO_DISCOVER_OPS}" ]; then
+          AUTO_DISCOVER_OPS="${op_name}"
+        else
+          AUTO_DISCOVER_OPS="${AUTO_DISCOVER_OPS},${op_name}"
+        fi
+      fi
+    fi
+  done
+  BUILD_OPS="${AUTO_DISCOVER_OPS}"
+  echo "Auto-discovered tests: ${BUILD_OPS}"
+fi
+
+echo "BUILD_OPS=${BUILD_OPS}, RUN_TEST=${RUN_TEST}, ENABLE_PACKAGE=${ENABLE_PACKAGE}"
 
 # ==========================
 # 环境检查（Ascend/CANN）
@@ -130,8 +169,10 @@ if [ -z "${ASC_DIR}" ]; then
 fi
 [ -n "${ASC_DIR}" ] && CMAKE_OPTIONS="${CMAKE_OPTIONS} -DASC_DIR=${ASC_DIR}"
 
-if [ -n "${BUILD_OP}" ]; then
-    CMAKE_OPTIONS="${CMAKE_OPTIONS} -DBUILD_TEST=ON -DTEST_NAME=${BUILD_OP}"
+if [ -n "${BUILD_OPS}" ]; then
+    # 将逗号分隔转换为 CMake 列表格式（分号分隔）
+    TEST_NAMES_CMAKE="${BUILD_OPS//,/;}"
+    CMAKE_OPTIONS="${CMAKE_OPTIONS} -DBUILD_TEST=ON -DTEST_NAMES=${TEST_NAMES_CMAKE}"
 fi
 
 if [ "${ENABLE_PACKAGE}" == "TRUE" ]; then
@@ -150,17 +191,50 @@ fi
 # 运行算子测试
 # ==========================
 if [ "${RUN_TEST}" == "ON" ]; then
-    if [ -z "${BUILD_OP}" ]; then
-        echo "Error: --run requires --op=<算子名>"
+    if [ -z "${BUILD_OPS}" ]; then
+        echo "Error: No tests found. Please check test directories or specify --ops=<算子名1,算子名2,...>"
         exit 1
     fi
 
-    TEST_BIN="${BUILD_DIR}/test/${BUILD_OP}/${BUILD_OP}_test"
-    if [ ! -f "${TEST_BIN}" ]; then
-        echo "Error: test binary not found: ${TEST_BIN}"
+    # 将逗号分隔的算子名转换为数组
+    IFS=',' read -ra OP_ARRAY <<< "${BUILD_OPS}"
+
+    FAILED_OPS=()
+    PASSED_OPS=()
+
+    for op in "${OP_ARRAY[@]}"; do
+        TEST_BIN="${BUILD_DIR}/test/${op}/${op}_test"
+        echo ""
+        echo "========== Running ${op}_test =========="
+        if [ ! -f "${TEST_BIN}" ]; then
+            echo "[ERROR] Test binary not found: ${TEST_BIN}"
+            FAILED_OPS+=("${op}")
+            continue
+        fi
+
+        # 临时禁用 errexit 以捕获测试退出码
+        set +e
+        "${TEST_BIN}"
+        exit_code=$?
+        set -e
+        if [ $exit_code -eq 0 ]; then
+            echo "[PASS] ${op}_test"
+            PASSED_OPS+=("${op}")
+        else
+            echo "[FAIL] ${op}_test (exit code: $exit_code)"
+            FAILED_OPS+=("${op}")
+        fi
+    done
+
+    # 汇总测试结果
+    echo ""
+    echo "========================================"
+    echo "Test Summary:"
+    echo "  Passed: ${#PASSED_OPS[@]} - ${PASSED_OPS[*]}"
+    echo "  Failed: ${#FAILED_OPS[@]} - ${FAILED_OPS[*]}"
+    echo "========================================"
+
+    if [ ${#FAILED_OPS[@]} -gt 0 ]; then
         exit 1
     fi
-
-    echo "Running ${BUILD_OP}_test..."
-    "$TEST_BIN"
 fi

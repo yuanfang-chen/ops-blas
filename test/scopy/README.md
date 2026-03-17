@@ -68,7 +68,7 @@ y = x
 
 - 样例执行
   ```bash
-  bash build.sh --op=scopy --run # --op=<算子名> --run可选参数，执行测试样例
+  bash build.sh --ops=scopy --run # --ops=<算子名> --run可选参数，执行测试样例
   ```
   执行结果如下，说明精度对比成功。
   ```bash

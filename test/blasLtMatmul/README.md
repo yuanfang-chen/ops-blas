@@ -104,7 +104,7 @@ source ${install_path}/cann/set_env.sh
 - 样例执行
 
 ```bash
-bash build.sh --op=blasLtMatmul --soc=ascend950 --run
+bash build.sh --ops=blasLtMatmul --soc=ascend950 --run
 ```
 
 执行结果如下，说明精度对比成功。

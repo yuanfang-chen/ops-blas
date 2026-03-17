@@ -157,6 +157,7 @@ aclError aclblasLtMatmulTest(int32_t deviceId, aclrtStream& stream)
                     << ", golden: " << goldenOutput[errIdx] << std::endl;
       }
       std::cout << "matmul run failed!" << std::endl;
+      return ACL_ERROR_OP_OUTPUT_NOT_MATCH;
   }
 
   // 10. 释放资源

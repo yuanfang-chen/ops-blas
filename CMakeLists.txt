@@ -31,6 +31,29 @@ else()
 endif()
 message(STATUS "SOC_VERSION=${SOC_VERSION}, NPU_ARCH=${NPU_ARCH}")
 
+# ========= SOC 架构目录配置 =========
+# 根据 SOC 返回需要编译的架构目录列表
+function(get_soc_arch_dirs soc_version arch_dirs)
+  string(TOLOWER "${soc_version}" soc_lower)
+  set(dirs "")
+  
+  if(soc_lower MATCHES "^ascend950")
+    list(APPEND dirs "arch35")
+  elseif(soc_lower MATCHES "^ascend310p")
+    list(APPEND dirs "arch20")
+  endif()
+  # 其他 SOC 可以根据需要添加
+  
+  set(${arch_dirs} ${dirs} PARENT_SCOPE)
+endfunction()
+
+# 获取当前 SOC 对应的架构目录
+get_soc_arch_dirs(${SOC_VERSION} SOC_ARCH_DIRS)
+message(STATUS "SOC_ARCH_DIRS=${SOC_ARCH_DIRS}")
+
+# 定义所有支持的架构特定目录（全局唯一定义）
+set(ARCH_SPECIFIC_DIRS arch35 arch20 CACHE INTERNAL "Architecture specific directories")
+
 set(ASCEND_CANN_PACKAGE_PATH $ENV{ASCEND_HOME_PATH})
 set(RUN_MODE "npu" CACHE STRING "run mode: npu")
 set(CMAKE_BUILD_TYPE "Debug" CACHE STRING "Build type Release/Debug" FORCE)
